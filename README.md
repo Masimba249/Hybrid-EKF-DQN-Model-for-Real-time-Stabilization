@@ -118,3 +118,51 @@ Simulations demonstrate superior performance in ideal, moderate (20 m/s), and st
 The hybrid model excels in disturbance rejection and adaptability.
 
 ## Repository Structure
+.
+├── src/                  # MATLAB source code (EKF implementation, DQN agent, hybrid controller, main scripts)
+├── simulations/          # Simulation scenarios, wind models, result logs
+├── docs/                 # Conference paper PDF
+│   └── IEEE_Conference_Template.pdf
+├── figures/              # Auto-generated plots (trajectories, rewards, errors)
+├── data/                 # Sample datasets (simulated sensor data)
+├── README.md             # This file
+├── LICENSE
+└── .gitignore
+
+
+## Requirements
+
+- MATLAB R2023a or later (tested on R2024b)
+- Required Toolboxes:
+  - Reinforcement Learning Toolbox
+  - Deep Learning Toolbox
+  - Control System Toolbox
+  - Aerospace Toolbox (recommended)
+
+Simulation-only; no hardware required.
+
+## Quick Start
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/ekf-dqn-quadcopter.git
+   cd ekf-dqn-quadcopter
+
+2. Open MATLAB and add the project folder to the path.
+3. Run the main hybrid simulation:matlabrun('src/main_hybrid_ekf_dqn.m')
+4. Results (plots, metrics) will appear and save to /figures/.
+
+
+## Citation
+If using this work or code, please cite the conference paper:
+bibtex@inproceedings{yessenzhanov2026,
+  title={Hybrid {EKF-DQN} Model for Real-time Stabilization and Drift Reduction of a Quadcopter {UAV}},
+  author={Yessenzhanov, Kuanysh and Masimba, Collins and Muhammad, Ilyas and Tanveer, Muhammad Hassan and Voicu, Razvan Cristian},
+  booktitle={IEEE Conference Proceedings},
+  year={2026}
+}
+## License
+MIT License — see LICENSE for details.
+
+Contributions Welcome!
+Feel free to open issues, suggest enhancements, or submit PRs (e.g., real-drone testing, alternative RL algorithms, extended environments).
