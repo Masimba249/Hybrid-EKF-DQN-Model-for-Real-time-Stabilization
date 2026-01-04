@@ -1,0 +1,218 @@
+% Generate time vector based on the length of P_R data
+t = 1:maxSteps;
+
+drone_data = height(data);
+
+% Assigning the variables using the correct column names from the data table
+P_R = rand(drone_data, 10) * 0.05;  % Placeholder for covariance data as P_R isn't in the file
+
+% Extract state variables from data
+xhatR = data{:, {'px', 'py', 'pz', 'vx', 'vy', 'vz', 'q1', 'q2', 'q3', 'q4'}};
+
+% Extract GPS and IMU measurements
+gps_data = data{:, {'GPS_px', 'GPS_py', 'GPS_pz'}};
+imu_data = data{:, {'IMU_vx', 'IMU_vy', 'IMU_vz'}};
+
+% Generate placeholder data for OMEGA and FX if not provided
+OMEGA = randn(drone_data, 3) * 0.1;      % Placeholder for bias-free angular velocities
+OMEGA_raw = OMEGA + randn(drone_data, 3) * 0.05;  % Raw angular velocities
+FX = randn(drone_data, 3) * 0.1;         % Placeholder for accelerometer data
+
+
+
+
+t = 1:length(P_R);
+
+% Plot covariance of position
+figure(1)
+plot(t, P_R(:, 1), 'LineWidth', 2)
+hold on
+plot(t, P_R(:, 2), 'LineWidth', 2)
+plot(t, P_R(:, 3), 'LineWidth', 2)
+title('Drift Analysis Based on Covariance of Position')
+legend('px', 'py', 'pz')
+grid on
+hold off
+
+% Plot covariance of velocities
+figure(2)
+plot(t, P_R(:, 4), 'LineWidth', 2)
+hold on
+plot(t, P_R(:, 5), 'LineWidth', 2)
+plot(t, P_R(:, 6), 'LineWidth', 2)
+title('Drift Analysis Based on Covariance of Velocities')
+legend('pxdot', 'pydot', 'pzdot')
+grid on
+hold off
+
+% Plot covariance of quaternions
+figure(3)
+plot(t, P_R(:, 7), 'LineWidth', 2)
+hold on
+plot(t, P_R(:, 8), 'LineWidth', 2)
+plot(t, P_R(:, 9), 'LineWidth', 2)
+plot(t, P_R(:, 10), 'LineWidth', 2)
+title('Covariance of Quaternions')
+legend('q0cov', 'q1cov', 'q2cov', 'q3cov')
+grid on
+hold off
+
+% Plot orientation angles (Phi, Theta, Psi)
+phi = atan2(2 * (xhatR(:, 7) .* xhatR(:, 8) + xhatR(:, 9) .* xhatR(:, 10)), 1 - 2 * (xhatR(:, 8).^2 + xhatR(:, 9).^2)) * (180 / pi);
+theta = asin(2 * (xhatR(:, 7) .* xhatR(:, 9) - xhatR(:, 10) .* xhatR(:, 8))) * (180 / pi);
+psi = atan2(2 * (xhatR(:, 7) .* xhatR(:, 10) + xhatR(:, 8) .* xhatR(:, 9)), 1 - 2 * (xhatR(:, 9).^2 + xhatR(:, 10).^2)) * (180 / pi);
+figure(8)
+plot(t, phi, 'LineWidth', 2)
+hold on
+plot(t, theta, 'LineWidth', 2)
+plot(t, psi, 'LineWidth', 2)
+title('Phi, Theta, Psi')
+legend('phi', 'theta', 'psi')
+grid on
+hold off
+
+% Plot position with GPS data
+figure(4)
+plot(t, xhatR(:, 1), 'LineWidth', 2)
+hold on
+plot(t, xhatR(:, 2), 'LineWidth', 2)
+plot(t, xhatR(:, 3), 'LineWidth', 2)
+plot(t, gps_data(:, 1), ':', 'LineWidth', 2)
+plot(t, gps_data(:, 2), ':', 'LineWidth', 2)
+plot(t, gps_data(:, 3), ':', 'LineWidth', 2)
+title('Position')
+legend('px', 'py', 'pz', 'pxgps', 'pygps', 'pzgps')
+grid on
+hold off
+
+% Plot velocity with IMU data
+figure(5)
+plot(t, xhatR(:, 4), 'LineWidth', 2)
+hold on
+plot(t, xhatR(:, 5), 'LineWidth', 2)
+plot(t, xhatR(:, 6), 'LineWidth', 2)
+plot(t, imu_data(:, 1), ':', 'LineWidth', 2)
+plot(t, imu_data(:, 2), ':', 'LineWidth', 2)
+plot(t, imu_data(:, 3), ':', 'LineWidth', 2)
+title('Velocity')
+legend('vx', 'vy', 'vz', 'vxgps', 'vygps', 'vzgps')
+grid on
+hold off
+
+% Plot quaternions
+figure(6)
+plot(t, xhatR(:, 7), 'LineWidth', 2)
+hold on
+plot(t, xhatR(:, 8), 'LineWidth', 2)
+plot(t, xhatR(:, 9), 'LineWidth', 2)
+plot(t, xhatR(:, 10), 'LineWidth', 2)
+title('Quaternions')
+legend('q0', 'q1', 'q2', 'q3')
+grid on
+hold off
+
+% Plot OMEGA without bias
+figure(7)
+plot(t, OMEGA(:, 1), 'LineWidth', 2)
+hold on
+plot(t, OMEGA(:, 2), 'LineWidth', 2)
+plot(t, OMEGA(:, 3), 'LineWidth', 2)
+title('OMEGA without bias')
+legend('p', 'q', 'r')
+grid on
+hold off
+
+% Plot OMEGA raw without Bias
+figure(10)
+plot(t, OMEGA_raw(:, 1), 'LineWidth', 2)
+hold on
+plot(t, OMEGA_raw(:, 2), 'LineWidth', 2)
+plot(t, OMEGA_raw(:, 3), 'LineWidth', 2)
+title('OMEGA raw without Bias')
+legend('p', 'q', 'r')
+grid on
+hold off
+
+% Plot accelerometer data
+figure(11)
+plot(t, FX(:, 1), 'LineWidth', 2)
+hold on
+plot(t, FX(:, 2), 'LineWidth', 2)
+plot(t, FX(:, 3), 'LineWidth', 2)
+title('Accelerometer')
+legend('ax', 'ay', 'az')
+grid on
+hold off
+
+
+% Placeholder for accumulated state and covariance values
+position_drift = zeros(maxSteps, 3);
+velocity_drift = zeros(maxSteps, 3);
+orientation_stability = zeros(maxSteps, 4);
+
+% For each step, store relevant metrics
+for i = 1:maxSteps
+    position_drift(i, :) = [state(1), state(2), state(3)];    % Position drift over time
+    velocity_drift(i, :) = [state(4), state(5), state(6)];    % Velocity drift over time
+    orientation_stability(i, :) = [state(7), state(8), state(9), state(10)]; % Quaternion stability
+end
+
+% Plot Position Drift
+figure(1)
+plot(t, position_drift(:, 1), 'LineWidth', 2);
+hold on
+plot(t, position_drift(:, 2), 'LineWidth', 2);
+plot(t, position_drift(:, 3), 'LineWidth', 2);
+title('Position Drift Over Time')
+xlabel('Time Steps')
+ylabel('Position (m)')
+legend('px', 'py', 'pz')
+grid on
+hold off
+
+% Plot Velocity Drift
+figure(2)
+plot(t, velocity_drift(:, 1), 'LineWidth', 2);
+hold on
+plot(t, velocity_drift(:, 2), 'LineWidth', 2);
+plot(t, velocity_drift(:, 3), 'LineWidth', 2);
+title('Velocity Drift Over Time')
+xlabel('Time Steps')
+ylabel('Velocity (m/s)')
+legend('vx', 'vy', 'vz')
+grid on
+hold off
+
+% Plot Orientation Stability (Quaternions)
+figure(3)
+plot(t, orientation_stability(:, 1), 'LineWidth', 2);
+hold on
+plot(t, orientation_stability(:, 2), 'LineWidth', 2);
+plot(t, orientation_stability(:, 3), 'LineWidth', 2);
+plot(t, orientation_stability(:, 4), 'LineWidth', 2);
+title('Orientation Stability (Quaternion)')
+xlabel('Time Steps')
+ylabel('Quaternion')
+legend('q1', 'q2', 'q3', 'q4')
+grid on
+hold off
+
+% Plot RMSE values for each metric over episodes
+figure;
+subplot(3,1,1);
+plot(1:numEpisodes, position_rmse, 'LineWidth', 2);
+title('Position RMSE Over Episodes');
+xlabel('Episode');
+ylabel('Position RMSE');
+
+subplot(3,1,2);
+plot(1:numEpisodes, velocity_rmse, 'LineWidth', 2);
+title('Velocity RMSE Over Episodes');
+xlabel('Episode');
+ylabel('Velocity RMSE');
+
+subplot(3,1,3);
+plot(1:numEpisodes, orientation_rmse, 'LineWidth', 2);
+title('Orientation RMSE Over Episodes');
+xlabel('Episode');
+ylabel('Orientation RMSE');
